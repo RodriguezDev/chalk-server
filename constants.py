@@ -6,5 +6,5 @@ https://developer.twitter.com/en/portal/petition/essential/basic-info
 """
 BEARER_TOKEN = "xyz"
 
-USER_ID_TO_GET_LIKES_FROM = 123
-TWEETS_PER_REQUEST = 100
+USERNAME_TO_GET_LIKES_FROM = "jack"
+TWEETS_PER_REQUEST = 10
