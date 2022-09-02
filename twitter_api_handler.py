@@ -17,8 +17,10 @@ class TwitterApiHandler:
     _next_page_token = ''
     _user_id = None
     _headers = {'Authorization': 'Bearer ' + constants.BEARER_TOKEN}
+    _total_tweets_parsed = 0
 
-    def __init__(self):
+    def __init__(self, page_token_to_start_from=''):
+        self._next_page_token = page_token_to_start_from
         self._user_id = self._get_user_id_for_username()
         print("User ID for @{}: {}".format(constants.USERNAME_TO_GET_LIKES_FROM, self._user_id))
 
@@ -33,13 +35,18 @@ class TwitterApiHandler:
             url += '&pagination_token=' + self._next_page_token
 
         response = requests.get(url, headers=self._headers).json()
+        print(response)
         self._get_next_page_token(response)
-        parsed_response = self._get_tweets_from_json(response)
+        parsed_tweets = self._get_tweets_from_json(response)
 
-        print("Retrieved & parsed {} tweets. Next page token: {}".format(len(parsed_response), self._next_page_token))
-        return parsed_response
+        self._total_tweets_parsed += len(parsed_tweets)
+        print("Retrieved & parsed {} tweets, {} tweets total. Next page token: {}"
+              .format(len(parsed_tweets), self._total_tweets_parsed, self._next_page_token))
+
+        return parsed_tweets
 
     def reset(self):
+        self._total_tweets_parsed = 0
         self._next_page_token = ''
 
     def _get_user_id_for_username(self) -> str:
@@ -53,4 +60,6 @@ class TwitterApiHandler:
 
     @staticmethod
     def _get_tweets_from_json(tweet_json) -> [Tweet]:
+        if tweet_json['meta']['result_count'] == 0:
+            return []
         return [Tweet(tweet['id'], tweet['text']) for tweet in tweet_json['data']]
