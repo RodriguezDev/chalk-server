@@ -2,7 +2,7 @@ from collections import namedtuple
 import constants
 import requests
 
-Tweet = namedtuple('Tweet', ['id', 'text'])
+Tweet = namedtuple('Tweet', ['id', 'text', 'author_id', 'created_at'])
 
 
 class TwitterApiHandler:
@@ -30,12 +30,11 @@ class TwitterApiHandler:
             return []
 
         url = 'https://api.twitter.com/2/users/' + self._user_id + '/liked_tweets?max_results=' \
-              + str(constants.TWEETS_PER_REQUEST)
+              + str(constants.TWEETS_PER_REQUEST) + '&tweet.fields=created_at%2Cauthor_id'
         if self._next_page_token != "":
             url += '&pagination_token=' + self._next_page_token
 
         response = requests.get(url, headers=self._headers).json()
-        print(response)
         self._get_next_page_token(response)
         parsed_tweets = self._get_tweets_from_json(response)
 
@@ -62,4 +61,4 @@ class TwitterApiHandler:
     def _get_tweets_from_json(tweet_json) -> [Tweet]:
         if tweet_json['meta']['result_count'] == 0:
             return []
-        return [Tweet(tweet['id'], tweet['text']) for tweet in tweet_json['data']]
+        return [Tweet(tweet['id'], tweet['text'], tweet['author_id'], tweet['created_at']) for tweet in tweet_json['data']]
