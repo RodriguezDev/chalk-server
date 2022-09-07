@@ -1,8 +1,5 @@
-from collections import namedtuple
 import constants
 import requests
-
-Tweet = namedtuple('Tweet', ['id', 'text', 'author_id', 'created_at'])
 
 
 class TwitterApiHandler:
