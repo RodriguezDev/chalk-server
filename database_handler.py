@@ -17,3 +17,7 @@ class DatabaseHandler:
         response = self._liked_tweets_collection.insert_many(tweets)
         print("Added {} tweets to [{}: {}]"
               .format(len(response.inserted_ids), constants.MONGO_DATABASE_NAME, constants.MONGO_DATABASE_COLLECTION))
+
+    def get_random_like(self):
+        cursor = self._liked_tweets_collection.aggregate([{'$sample': {'size': 1}}])
+        return [tweet for tweet in cursor][0]
